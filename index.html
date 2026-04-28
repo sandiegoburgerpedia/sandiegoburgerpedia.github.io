@@ -481,16 +481,27 @@ function card(b) {
   </div>`;
 }
 
+function renderChips(containerId, values, current) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = uniq(values).map(v =>
+    `<div class="chip${v === current ? ' on' : ''}" data-val="${v}">${v === 'all' ? 'All' : v}</div>`
+  ).join('');
+  el.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      const val = this.getAttribute('data-val');
+      if (containerId === 'area-chips') { aF = val; renderArea(); }
+      else { sF = val; renderStyle(); }
+    });
+  });
+}
+
 function renderArea() {
   let list = burgers;
   if (aF !== 'all') list = list.filter(b => b.hood === aF);
   if (retA) list = list.filter(b => b.ret);
   document.getElementById('area-count').textContent = `${list.length} spot${list.length !== 1 ? 's' : ''}`;
   document.getElementById('area-cards').innerHTML = list.length ? list.map(card).join('') : '<div class="empty">No spots match this filter</div>';
-  const hoods = burgers.map(b => b.hood);
-  document.getElementById('area-chips').innerHTML = uniq(hoods).map(v =>
-    `<div class="chip${v === aF ? ' on' : ''}" onclick="setA('${v.replace(/'/g,"\\'")}'">${v === 'all' ? 'All' : v}</div>`
-  ).join('');
+  renderChips('area-chips', burgers.map(b => b.hood), aF);
 }
 
 function renderStyle() {
@@ -499,10 +510,7 @@ function renderStyle() {
   if (retS) list = list.filter(b => b.ret);
   document.getElementById('style-count').textContent = `${list.length} spot${list.length !== 1 ? 's' : ''}`;
   document.getElementById('style-cards').innerHTML = list.length ? list.map(card).join('') : '<div class="empty">No spots match this filter</div>';
-  const styles = burgers.map(b => b.styleN);
-  document.getElementById('style-chips').innerHTML = uniq(styles).map(v =>
-    `<div class="chip${v === sF ? ' on' : ''}" onclick="setS('${v.replace(/'/g,"\\'")}'">${v === 'all' ? 'All' : v}</div>`
-  ).join('');
+  renderChips('style-chips', burgers.map(b => b.styleN), sF);
 }
 
 function renderSearch() {
@@ -516,9 +524,6 @@ function renderSearch() {
   document.getElementById('search-count').textContent = `${list.length} spot${list.length !== 1 ? 's' : ''}`;
   document.getElementById('search-cards').innerHTML = list.length ? list.map(card).join('') : '<div class="empty">No spots found</div>';
 }
-
-function setA(v) { aF = v; renderArea(); }
-function setS(v) { sF = v; renderStyle(); }
 
 function toggleRet(t) {
   if (t === 'a') { retA = !retA; document.getElementById('trk-a').classList.toggle('on', retA); renderArea(); }
