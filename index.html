@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>San Diego BurgerPedia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #D85A30;
+    --orange-dark: #993C1D;
+    --orange-light: #FAECE7;
+    --cream: #FAF7F2;
+    --ink: #1A1714;
+    --ink-2: #4A4540;
+    --ink-3: #888078;
+    --border: rgba(26,23,20,0.12);
+    --border-mid: rgba(26,23,20,0.2);
+    --white: #ffffff;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: var(--cream); }
+  body { font-family: 'DM Sans', sans-serif; color: var(--ink); background: var(--cream); min-height: 100vh; }
+
+  /* BETA BANNER */
+  .beta-bar {
+    background: var(--ink);
+    color: var(--cream);
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 12px;
+    letter-spacing: 0.03em;
+  }
+  .beta-bar a { color: var(--orange); text-decoration: none; font-weight: 500; }
+  .beta-bar a:hover { text-decoration: underline; }
+
+  /* HEADER */
+  header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 16px 16px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 1px;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .logo span { color: var(--orange); }
+  .tagline {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+  }
+
+  /* STATS */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat {
+    flex: 1;
+    text-align: center;
+    padding: 12px 8px;
+    border-right: 1px solid var(--border);
+    max-width: 120px;
+  }
+  .stat:last-child { border-right: none; }
+  .stat-n {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    color: var(--orange);
+    line-height: 1;
+  }
+  .stat-l {
+    font-size: 10px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 2px;
+  }
+
+  /* MAIN CONTENT */
+  .container { max-width: 540px; margin: 0 auto; padding: 16px 14px 80px; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px;
+  }
+  .tab {
+    flex: 1;
+    padding: 8px 6px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    background: transparent;
+    color: var(--ink-3);
+    cursor: pointer;
+    text-align: center;
+    border: none;
+    transition: all 0.15s;
+  }
+  .tab.on { background: var(--orange); color: var(--white); }
+
+  /* FILTERS */
+  .section-label {
+    font-size: 10px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .chip {
+    padding: 5px 13px;
+    border-radius: 20px;
+    border: 1px solid var(--border-mid);
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--white);
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  .chip:hover { border-color: var(--orange); color: var(--orange); }
+  .chip.on { background: var(--orange); color: var(--white); border-color: var(--orange); }
+
+  /* TOGGLE */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .trk {
+    width: 38px;
+    height: 22px;
+    border-radius: 11px;
+    background: #ddd;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .tth {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--white);
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    transition: left 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .trk.on { background: var(--orange); }
+  .trk.on .tth { left: 19px; }
+  .toggle-label { font-size: 13px; color: var(--ink-2); font-weight: 500; }
+
+  /* COUNT */
+  .count { font-size: 12px; color: var(--ink-3); margin-bottom: 12px; }
+
+  /* CARDS */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+    transition: border-color 0.15s;
+  }
+  .card:hover { border-color: var(--border-mid); }
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .card-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .card-hood {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 2px;
+  }
+  .badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .badge-ret { background: var(--orange-light); color: var(--orange-dark); }
+  .badge-nope { background: #F1EFE8; color: #5F5E5A; }
+  .badge-popup { background: #E6F1FB; color: #185FA5; }
+  .card-desc {
+    font-size: 13px;
+    color: var(--ink-2);
+    margin-top: 9px;
+    line-height: 1.5;
+  }
+  .card-tags {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: var(--cream);
+    color: var(--ink-3);
+  }
+  .tag-style { background: var(--orange-light); color: var(--orange-dark); }
+  .card-links {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .btn {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-mid);
+    color: var(--ink-2);
+    text-decoration: none;
+    background: var(--white);
+    cursor: pointer;
+    transition: all 0.12s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .btn:hover { border-color: var(--ink-3); }
+  .btn-primary {
+    background: var(--orange);
+    color: var(--white);
+    border-color: var(--orange);
+  }
+  .btn-primary:hover { background: var(--orange-dark); border-color: var(--orange-dark); }
+
+  /* SEARCH */
+  .search-wrap {
+    position: relative;
+    margin-bottom: 14px;
+  }
+  .search-wrap input {
+    width: 100%;
+    padding: 10px 14px 10px 38px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-mid);
+    background: var(--white);
+    color: var(--ink);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-wrap input:focus { border-color: var(--orange); }
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-3);
+    pointer-events: none;
+    font-size: 15px;
+  }
+
+  /* EMPTY */
+  .empty {
+    text-align: center;
+    padding: 40px 16px;
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 20px 16px;
+    font-size: 11px;
+    color: var(--ink-3);
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+  footer a { color: var(--orange); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="beta-bar">
+  🍔 Beta v1 — work in progress. <a href="https://www.instagram.com/aburgaweek" target="_blank">DM us on Instagram</a> to suggest a spot or leave feedback.
+</div>
+
+<header>
+  <div class="logo">San Diego <span>BurgerPedia</span></div>
+  <div class="tagline">Every burger worth eating in San Diego — reviewed one a week</div>
+</header>
+
+<div class="stats">
+  <div class="stat"><div class="stat-n" id="total-n">40</div><div class="stat-l">spots visited</div></div>
+  <div class="stat"><div class="stat-n" id="ret-n">0</div><div class="stat-l">returners</div></div>
+  <div class="stat"><div class="stat-n" id="hood-n">0</div><div class="stat-l">neighborhoods</div></div>
+</div>
+
+<div class="container">
+  <div class="tabs">
+    <button class="tab on" onclick="switchTab('area')">By neighborhood</button>
+    <button class="tab" onclick="switchTab('style')">By style</button>
+    <button class="tab" onclick="switchTab('search')">Search</button>
+  </div>
+
+  <!-- AREA TAB -->
+  <div id="area-view">
+    <div class="section-label">Filter by neighborhood</div>
+    <div class="chips" id="area-chips"></div>
+    <div class="toggle-row" onclick="toggleRet('a')">
+      <div class="trk" id="trk-a"><div class="tth"></div></div>
+      <span class="toggle-label">Returners only</span>
+    </div>
+    <div class="count" id="area-count"></div>
+    <div id="area-cards"></div>
+  </div>
+
+  <!-- STYLE TAB -->
+  <div id="style-view" style="display:none">
+    <div class="section-label">Filter by burger style</div>
+    <div class="chips" id="style-chips"></div>
+    <div class="toggle-row" onclick="toggleRet('s')">
+      <div class="trk" id="trk-s"><div class="tth"></div></div>
+      <span class="toggle-label">Returners only</span>
+    </div>
+    <div class="count" id="style-count"></div>
+    <div id="style-cards"></div>
+  </div>
+
+  <!-- SEARCH TAB -->
+  <div id="search-view" style="display:none">
+    <div class="search-wrap">
+      <span class="search-icon">&#128269;</span>
+      <input type="text" id="search-input" placeholder="Search by name, neighborhood, or style..." oninput="renderSearch()">
+    </div>
+    <div class="count" id="search-count"></div>
+    <div id="search-cards"></div>
+  </div>
+</div>
+
+<footer>
+  <p>Made with &#10084; in San Diego &nbsp;·&nbsp; <a href="https://www.instagram.com/aburgaweek" target="_blank">@aburgaweek</a> on Instagram</p>
+  <p style="margin-top:6px">Last updated: <span id="last-updated"></span></p>
+</footer>
+
+<script>
+const burgers = [
+  {name:"Hodad's",style:"Flat top",hood:"OB",ret:true,desc:"A SD legacy burger joint, all should visit once.",ig:"https://www.instagram.com/p/DXABnbzlY_E/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/q54BFExkB87vPtG58"},
+  {name:"Moe's",style:"Steakhouse",hood:"Mission Beach",ret:true,desc:"Really great sweet & salty burger.",ig:"https://www.instagram.com/p/DWzsyqBjXia/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/wiSkietV9kz8jcw16"},
+  {name:"Shakespeare's",style:"Thick patty",hood:"Mission Hills",ret:false,desc:"Thick patty pub burger, grab a Guinness too.",ig:"https://www.instagram.com/p/DWj109BAeCN/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/SjvQncQfZiggKo1t6"},
+  {name:"Craft & Commerce",style:"Thick patty",hood:"Little Italy",ret:true,desc:"Lots of potential, tasty sauce.",ig:"https://www.instagram.com/p/DWPykNbAdAU/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/CKMCjEvS6vhmn9B77"},
+  {name:"Deckman's",style:"Thick smash",hood:"North Park",ret:true,desc:"Expensive, everything made from scratch.",ig:"https://www.instagram.com/p/DV1q95SgXO_/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/ybegmNKDwkryiF859"},
+  {name:"Gus's",style:"Patty melt",hood:"La Mesa",ret:false,desc:"Skip the burger, get the pastrami!",ig:"https://www.instagram.com/p/DVcLvRJkgfH/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/unnpUdDhf6nGUEwL6"},
+  {name:"Abbey's BBQ",style:"Thick patty",hood:"Miramar",ret:false,desc:"Thick patty brisket burger.",ig:"https://www.instagram.com/p/DU1o9z4jSwA/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/tPioKAjmms4dDhTAA"},
+  {name:"The Pub",style:"Flat top",hood:"Lake Cuyamaca",ret:true,desc:"Great burger if you're in the area.",ig:"https://www.instagram.com/p/DUoDUksCaA8/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/gMWCggSZ4yGUq8tU9"},
+  {name:"Biersal",style:"Smash",hood:"South Park",ret:false,desc:"Unique & German inspired.",ig:"https://www.instagram.com/p/DUWOtkokrPs/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/PNa3Ex7GQvy6y5NW8"},
+  {name:"Chief's Burger",style:"Flat top",hood:"Solana Beach",ret:false,desc:"Above average bar burger.",ig:"https://www.instagram.com/p/DT7CT7QFDPe/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/LycU97xXyd4b6is98"},
+  {name:"Thai Burger Co",style:"Smash",hood:"Barrio Logan",ret:true,desc:"Thai inspired burger with rice buns!",ig:"https://www.instagram.com/p/DTln1RPjVm_/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/3DrkRz662pUDnww39"},
+  {name:"VanMan's",style:"Smash",hood:"PB",ret:true,desc:"Food source conscious quality burg.",ig:"https://www.instagram.com/p/DTd8fYoEtBI/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/FDiuFF6QkJDAzt2c6"},
+  {name:"Kingfisher",style:"Thick patty",hood:"Golden Hill",ret:true,desc:"Mondays only (not always available).",ig:"https://www.instagram.com/p/DTJxvcKDU3W/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/1y2XcMX68wqN4aKW8"},
+  {name:"Starlite",style:"Thick patty",hood:"Middletown",ret:true,desc:"Very decadent burger. Salty!",ig:"https://www.instagram.com/p/DS31sBflKOr/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/yvFMcorLVxGvWCct7"},
+  {name:"Order Fire BBQ",style:"Thick patty",hood:"Pop-up",ret:true,desc:"Smoked brisket burger.",ig:"https://www.instagram.com/p/DRVxAbSEQjD/?igsh=NTc4MTIwNjQ2YQ==",maps:null,popup:true},
+  {name:"Bomb Buns",style:"Smash",hood:"El Cajon",ret:false,desc:"Unique UFO burger.",ig:"https://www.instagram.com/p/DRFlnfngSNb/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/YLYC4Cceg7crQFfc7"},
+  {name:"Books & Records",style:"Thick smash",hood:"Bankers Hill",ret:true,desc:"Interesting sauce + potato sticks!",ig:"https://www.instagram.com/p/DQvSc3LEVcp/?img_index=1&igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/hZYPFK1ARna5havi6"},
+  {name:"Grater Grilled Cheese",style:"Patty melt",hood:"Mission Valley",ret:false,desc:"Grilled cheese portion is excellent.",ig:"https://www.instagram.com/p/DQdQXY5kYsZ/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/DwVxkxwYJs2WovCz5"},
+  {name:"The Market Place",style:"Flat top",hood:"Bankers Hill",ret:true,desc:"Quality for the price.",ig:"https://www.instagram.com/p/DQLBWEWgbey/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/r8FWFT4vAVyRe7WM6"},
+  {name:"Fort Oak",style:"Thick patty",hood:"Mission Hills",ret:false,desc:"Executed well and high quality.",ig:"https://www.instagram.com/p/DP5AJJYD6B3/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/qJWSVRKaoZJzpHVDA"},
+  {name:"Kinchana",style:"Smash",hood:"College Area",ret:true,desc:"Really tasty fusion burgers.",ig:"https://www.instagram.com/p/DPrgTw1jXD5/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/k81aUgZcgQ7XeeXP7"},
+  {name:"The Remy",style:"Thick smash",hood:"Hotel Circle",ret:false,desc:"Burger only at happy hour.",ig:"https://www.instagram.com/p/DPXs4hxAMoB/?img_index=1&igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/PZsZsGVJfaARrqka9"},
+  {name:"Sonny's Pizza",style:"Chargrilled",hood:"University Heights",ret:true,desc:"Tasty thick patty burg.",ig:"https://www.instagram.com/p/DPC3ngXgaY_/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/aqQfLSwTgTYvZg7W7"},
+  {name:"Greek Chicken",style:"Flat top",hood:"El Cajon",ret:false,desc:"Affordable classic American burg.",ig:"https://www.instagram.com/p/DO7QtoOATZm/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/VGEKNzYomoWzpjUy5"},
+  {name:"Chicken Pie Shop",style:"Thick patty",hood:"North Park",ret:false,desc:"No frills old school burger.",ig:"https://www.instagram.com/p/DOxDOb7if6I/?img_index=1&igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/vuxJnMfSdCmb241m7"},
+  {name:"Rare Society",style:"Thick patty",hood:"University Heights",ret:true,desc:"Amazing burger. Only at happy hour.",ig:"https://www.instagram.com/p/DOe6uvpDyiW/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/ujm2wq243fyuHu5d7"},
+  {name:"Trust",style:"Smash",hood:"Hillcrest",ret:true,desc:"$10 with fries and solid! (Happy hour)",ig:"https://www.instagram.com/p/DORJa2iCbCd/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/TcwjA33etXxGY7LJ6"},
+  {name:"Nunu's Tavern",style:"Thick patty",hood:"Hillcrest",ret:false,desc:"Smoked Gouda BBQ burger.",ig:"https://www.instagram.com/p/DOICHnKDulm/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/DLMWo1i4ApuwqssSA"},
+  {name:"Sisters Pizza",style:"Flat top",hood:"Hillcrest",ret:true,desc:"Classic American nostalgic burger.",ig:"https://www.instagram.com/p/DNzhTNn3Kco/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/8XU6UpJggc8qv7et8"},
+  {name:"For The Win",style:"Smash",hood:"PB",ret:true,desc:"Lacy edge and great sauce.",ig:"https://www.instagram.com/p/DMYs5qbBxDG/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/85EtQFDi85nfJGDX8"},
+  {name:"Working Class",style:"Flat top",hood:"North Park",ret:false,desc:"Overall a solid burger.",ig:"https://www.instagram.com/p/DMQ-S0dyNhu/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/7Lbr4HvYLzX1GPVM6"},
+  {name:"Brody's",style:"Flat top",hood:"Jamul",ret:false,desc:"Lots of specialty burgers.",ig:"https://www.instagram.com/p/DLuxWk3xr-g/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/nNzZ5EzkzQaipWP1A"},
+  {name:"SD Burger Co",style:"Flat top",hood:"Downtown",ret:false,desc:"Tourist trap burger.",ig:"https://www.instagram.com/p/DLX72Xfu9d-/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/YYqYUTmaRTT17X827"},
+  {name:"e.l.e",style:"Smash",hood:"PB",ret:true,desc:"Popular & tasty popup in PB.",ig:"https://www.instagram.com/p/DK5D4PuS_yR/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/UGXxpt3LGtcFrP3C9",popup:true},
+  {name:"Farm to Smash",style:"Smash",hood:"Escondido",ret:true,desc:"Seed oil free, tallow fries.",ig:"https://www.instagram.com/p/DKipXKHpVVQ/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/xfQna64oR9vsart46"},
+  {name:"The Tilted Stick",style:"Flat top",hood:"OB",ret:false,desc:"Beer, burger & fries $10.",ig:"https://www.instagram.com/p/DKP0DGSy2V3/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/yhyvcSF87aP2i8de7"},
+  {name:"Draft",style:"Patty melt",hood:"Mission Beach",ret:false,desc:"Great Caesar salad.",ig:"https://www.instagram.com/p/DJ9q0Ftp_dF/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/xLavtCa1Am4xV5xJA"},
+  {name:"Cutwater",style:"Thick smash",hood:"Miramar",ret:true,desc:"Really great lunch combo.",ig:"https://www.instagram.com/p/DJuglkLyqvE/?img_index=1&igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/BsXbKqaAcTdJXcNbA"},
+  {name:"BeachBum",style:"Chargrilled",hood:"Pop-up",ret:true,desc:"Really tasty chargrilled burger.",ig:"https://www.instagram.com/p/DJmqfZ9Sx5v/?igsh=NTc4MTIwNjQ2YQ==",maps:null,popup:true},
+  {name:"Benny's",style:"Flat top",hood:"Golden Hill",ret:true,desc:"Cheap and delicious.",ig:"https://www.instagram.com/p/DJSH4oeyA69/?igsh=NTc4MTIwNjQ2YQ==",maps:"https://maps.app.goo.gl/fKPE6YGtt6a8NR3S7"},
+];
+
+function normalizeStyle(s) {
+  if (!s) return 'Other';
+  const t = s.trim().toLowerCase();
+  if (t === 'thick smash' || t.includes('thick smash')) return 'Thick smash';
+  if (t.includes('smash')) return 'Smash';
+  if (t.includes('flat') || t === 'flattop') return 'Flat top';
+  if (t.includes('thick')) return 'Thick patty';
+  if (t.includes('patty melt')) return 'Patty melt';
+  if (t.includes('chargrill')) return 'Chargrilled';
+  if (t.includes('steak')) return 'Steakhouse';
+  return s.trim();
+}
+
+burgers.forEach(b => { b.styleN = normalizeStyle(b.style); });
+
+// Stats
+document.getElementById('total-n').textContent = burgers.length;
+document.getElementById('ret-n').textContent = burgers.filter(b => b.ret).length;
+document.getElementById('hood-n').textContent = new Set(burgers.filter(b => !b.popup).map(b => b.hood)).size;
+document.getElementById('last-updated').textContent = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+
+let aF = 'all', sF = 'all', retA = false, retS = false;
+
+function uniq(arr) { return ['all', ...[...new Set(arr)].sort()]; }
+
+function badge(b) {
+  if (b.popup) return '<span class="badge badge-popup">Pop-up</span>';
+  if (b.ret) return '<span class="badge badge-ret">&#10003; Returner</span>';
+  return '<span class="badge badge-nope">One &amp; done</span>';
+}
+
+function card(b) {
+  const mapsBtn = b.maps ? `<a class="btn" href="${b.maps}" target="_blank">&#128205; Maps</a>` : '';
+  return `<div class="card">
+    <div class="card-top">
+      <div>
+        <div class="card-name">${b.name}</div>
+        <div class="card-hood">${b.hood}</div>
+      </div>
+      ${badge(b)}
+    </div>
+    <div class="card-desc">${b.desc}</div>
+    <div class="card-tags">
+      <span class="tag tag-style">${b.styleN}</span>
+      <span class="tag">${b.hood}</span>
+    </div>
+    <div class="card-links">
+      <a class="btn btn-primary" href="${b.ig}" target="_blank">&#128247; View post</a>
+      ${mapsBtn}
+    </div>
+  </div>`;
+}
+
+function renderArea() {
+  let list = burgers;
+  if (aF !== 'all') list = list.filter(b => b.hood === aF);
+  if (retA) list = list.filter(b => b.ret);
+  document.getElementById('area-count').textContent = `${list.length} spot${list.length !== 1 ? 's' : ''}`;
+  document.getElementById('area-cards').innerHTML = list.length ? list.map(card).join('') : '<div class="empty">No spots match this filter</div>';
+  const hoods = burgers.map(b => b.hood);
+  document.getElementById('area-chips').innerHTML = uniq(hoods).map(v =>
+    `<div class="chip${v === aF ? ' on' : ''}" onclick="setA('${v.replace(/'/g,"\\'")}'">${v === 'all' ? 'All' : v}</div>`
+  ).join('');
+}
+
+function renderStyle() {
+  let list = burgers;
+  if (sF !== 'all') list = list.filter(b => b.styleN === sF);
+  if (retS) list = list.filter(b => b.ret);
+  document.getElementById('style-count').textContent = `${list.length} spot${list.length !== 1 ? 's' : ''}`;
+  document.getElementById('style-cards').innerHTML = list.length ? list.map(card).join('') : '<div class="empty">No spots match this filter</div>';
+  const styles = burgers.map(b => b.styleN);
+  document.getElementById('style-chips').innerHTML = uniq(styles).map(v =>
+    `<div class="chip${v === sF ? ' on' : ''}" onclick="setS('${v.replace(/'/g,"\\'")}'">${v === 'all' ? 'All' : v}</div>`
+  ).join('');
+}
+
+function renderSearch() {
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  const list = q ? burgers.filter(b =>
+    b.name.toLowerCase().includes(q) ||
+    b.hood.toLowerCase().includes(q) ||
+    b.styleN.toLowerCase().includes(q) ||
+    b.desc.toLowerCase().includes(q)
+  ) : burgers;
+  document.getElementById('search-count').textContent = `${list.length} spot${list.length !== 1 ? 's' : ''}`;
+  document.getElementById('search-cards').innerHTML = list.length ? list.map(card).join('') : '<div class="empty">No spots found</div>';
+}
+
+function setA(v) { aF = v; renderArea(); }
+function setS(v) { sF = v; renderStyle(); }
+
+function toggleRet(t) {
+  if (t === 'a') { retA = !retA; document.getElementById('trk-a').classList.toggle('on', retA); renderArea(); }
+  else { retS = !retS; document.getElementById('trk-s').classList.toggle('on', retS); renderStyle(); }
+}
+
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach((el, i) => el.classList.toggle('on', ['area','style','search'][i] === t));
+  document.getElementById('area-view').style.display = t === 'area' ? '' : 'none';
+  document.getElementById('style-view').style.display = t === 'style' ? '' : 'none';
+  document.getElementById('search-view').style.display = t === 'search' ? '' : 'none';
+  if (t === 'style') renderStyle();
+  if (t === 'search') renderSearch();
+}
+
+renderArea();
+</script>
+</body>
+</html>
